@@ -1,23 +1,19 @@
-FROM python:3.12-slim
+FROM rockylinux:9
 
-# Prevent .pyc files and enable unbuffered logging
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN dnf -y update && \
+    dnf -y install python3 python3-pip gcc python3-devel postgresql-devel && \
+    dnf clean all
+
 WORKDIR /app
 
-# Install system deps for psycopg2
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential libpq-dev && \
-    rm -rf /var/lib/apt/lists/*
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy your code
-COPY . /app
-
-# Install Python dependencies
-RUN pip install --no-cache-dir "fastapi[all]" uvicorn psycopg2-binary
+COPY . .
 
 EXPOSE 8000
 
-# Run FastAPI with Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
