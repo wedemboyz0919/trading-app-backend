@@ -1,0 +1,9 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.swp
+*.bk*
+app-1.py
+main-1.py
+main-2.py
